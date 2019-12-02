@@ -13,13 +13,8 @@ namespace AdventOfCode._2019.Day01
             int[] inputMasses = inputData.Select(i => int.Parse(i.Trim())).ToArray();
             var masses = ImmutableList.Create(inputMasses);
 
-            int sumOfFuelRequirements = 0;
-            foreach (var mass in masses)
-            {
-                int fuelRequirement = mass / 3 - 2;
-                sumOfFuelRequirements += fuelRequirement;
-            }
-
+            int sumOfFuelRequirements = masses.Sum(m => FuelRequirementCalculator.Calculate(m));
+            
             Console.WriteLine(sumOfFuelRequirements);
         }
     }
