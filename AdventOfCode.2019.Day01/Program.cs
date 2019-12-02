@@ -15,7 +15,10 @@ namespace AdventOfCode._2019.Day01
 
             int sumOfFuelRequirements = masses.Sum(m => FuelRequirementCalculator.Calculate(m));
             
-            Console.WriteLine(sumOfFuelRequirements);
+            Console.WriteLine($"Sum of fuel level requirements: {sumOfFuelRequirements}");
+
+            int sumOfFuelRequirementsWithFuelAddedMass = masses.Sum(m => FuelRequirementCalculator.CalculateWithAddedFuel(m));
+            Console.WriteLine($"Sum of fuel level requirements with fuel added masses: {sumOfFuelRequirementsWithFuelAddedMass}");
         }
     }
 }
