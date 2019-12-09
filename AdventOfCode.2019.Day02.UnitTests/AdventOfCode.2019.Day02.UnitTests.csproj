@@ -14,4 +14,8 @@
     <PackageReference Include="coverlet.collector" Version="1.0.1" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\AdventOfCode.2019.Day02\AdventOfCode.2019.Day02.csproj" />
+  </ItemGroup>
+
 </Project>

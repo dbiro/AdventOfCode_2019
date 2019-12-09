@@ -6,7 +6,7 @@ namespace AdventOfCode._2019.Day02
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Hello World!");
+            
         }
     }
 }
