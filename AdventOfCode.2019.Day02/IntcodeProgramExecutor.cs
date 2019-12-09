@@ -16,15 +16,15 @@ namespace AdventOfCode._2019.Day02
         {
             int opCode = input[opCodeIndex];
 
-            int[] result = null;
+            int[] output = null;
 
             switch (opCode)
             {
                 case 1:
-                    result = Execute(input, opCodeIndex, (a, b) => a + b);
+                    output = Execute(input, opCodeIndex, (a, b) => a + b);
                     break;
                 case 2:
-                    result = Execute(input, opCodeIndex, (a, b) => a * b);
+                    output = Execute(input, opCodeIndex, (a, b) => a * b);
                     break;
                 case 99:
                     break;  // program halted
@@ -32,13 +32,13 @@ namespace AdventOfCode._2019.Day02
                     throw new InvalidOperationException($"Invalid opcode: {opCode}");
             }
 
-            if (result == null)
+            if (output == null)
             {
                 return input;
             }
             else
             {
-                return Execute(result, opCodeIndex + 4);
+                return Execute(output, opCodeIndex + 4);
             }
         }
 
