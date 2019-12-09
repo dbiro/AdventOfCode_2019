@@ -5,7 +5,13 @@ VisualStudioVersion = 16.0.29519.87
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AdventOfCode.2019.Day01", "AdventOfCode.2019.Day01\AdventOfCode.2019.Day01.csproj", "{FE5135E1-C874-4630-BE28-05B5E1C11C3A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AdventOfCode.2019.Day02", "AdventOfCode.2019.Day02\AdventOfCode.2019.Day02.csproj", "{9EDC7650-C3D3-4577-A007-C811650823BE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AdventOfCode.2019.Day02", "AdventOfCode.2019.Day02\AdventOfCode.2019.Day02.csproj", "{9EDC7650-C3D3-4577-A007-C811650823BE}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Day01", "Day01", "{ABD63FF5-3859-439C-ACB3-62D659FBBE6D}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Day02", "Day02", "{5B03F11C-09FB-44D4-9913-55A8D9CE30EA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AdventOfCode.2019.Day02.UnitTests", "AdventOfCode.2019.Day02.UnitTests\AdventOfCode.2019.Day02.UnitTests.csproj", "{6329760D-7414-449C-955F-9FDEA1E501AA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,9 +27,18 @@ Global
 		{9EDC7650-C3D3-4577-A007-C811650823BE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9EDC7650-C3D3-4577-A007-C811650823BE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9EDC7650-C3D3-4577-A007-C811650823BE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6329760D-7414-449C-955F-9FDEA1E501AA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6329760D-7414-449C-955F-9FDEA1E501AA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6329760D-7414-449C-955F-9FDEA1E501AA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6329760D-7414-449C-955F-9FDEA1E501AA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{FE5135E1-C874-4630-BE28-05B5E1C11C3A} = {ABD63FF5-3859-439C-ACB3-62D659FBBE6D}
+		{9EDC7650-C3D3-4577-A007-C811650823BE} = {5B03F11C-09FB-44D4-9913-55A8D9CE30EA}
+		{6329760D-7414-449C-955F-9FDEA1E501AA} = {5B03F11C-09FB-44D4-9913-55A8D9CE30EA}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {CC32DF98-AD3D-48DA-81F2-4E793D5FF1E8}
