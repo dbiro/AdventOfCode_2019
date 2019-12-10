@@ -13,11 +13,7 @@ namespace AdventOfCode._2019.Day04
 
             for (password = rangeStart; password <= rangeEnd; password++)
             {
-                string passwordToString = password.ToString();
-                if (passwordToString.Length != 6)
-                {
-                    continue;
-                }
+                string passwordToString = password.ToString();                
 
                 if (PasswordValidator.Validate(passwordToString))
                 {

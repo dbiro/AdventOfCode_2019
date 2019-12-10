@@ -4,6 +4,11 @@
     {
         public static bool Validate(string password)
         {
+            if (password.Length != 6)
+            {
+                return false;
+            }
+
             bool neverDecrease = true;
             bool hasDoubleDigits = false;
 
