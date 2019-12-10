@@ -10,7 +10,8 @@
             }
 
             bool neverDecrease = true;
-            bool hasDoubleDigits = false;
+            bool hasMatchingPair = false;
+            int matchingPairsCount = 0;
 
             for (int i = 1; i < password.Length; i++)
             {
@@ -20,15 +21,23 @@
                 if (prevDigit > currentDigit)
                 {
                     neverDecrease = false;
+                    break;
                 }
 
                 if (prevDigit == currentDigit)
                 {
-                    hasDoubleDigits = true;
+                    matchingPairsCount++;
+                }
+                else if (matchingPairsCount > 0)
+                {
+                    hasMatchingPair |= matchingPairsCount == 1;
+                    matchingPairsCount = 0;
                 }
             }
 
-            return neverDecrease && hasDoubleDigits;
+            hasMatchingPair |= matchingPairsCount == 1;
+
+            return neverDecrease && hasMatchingPair;
         }
     }
 }
