@@ -5,7 +5,21 @@ using System.Text;
 namespace AdventOfCode._2019.Day03
 {
     public static class WirePathTracker
-    {
+    {        
+        public static int TrackWireToPoint(IEnumerable<(int i, int j)> wirePoints, (int i, int j) point)
+        {
+            int stepCount = 0;
+            foreach (var p in wirePoints)
+            {
+                stepCount++;
+                if (p.i == point.i && p.j == point.j)
+                {
+                    break;
+                }
+            }
+            return stepCount;
+        }
+
         public static List<(int, int)> TrackWire(IEnumerable<string> wirePath)
         {
             List<(int, int)> coordinates = new List<(int, int)>();
