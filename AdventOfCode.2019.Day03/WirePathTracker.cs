@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace AdventOfCode._2019.Day03
 {
@@ -9,10 +8,10 @@ namespace AdventOfCode._2019.Day03
         public static int TrackWireToPoint(IEnumerable<(int i, int j)> wirePoints, (int i, int j) point)
         {
             int stepCount = 0;
-            foreach (var p in wirePoints)
+            foreach (var wp in wirePoints)
             {
                 stepCount++;
-                if (p.i == point.i && p.j == point.j)
+                if (wp.i == point.i && wp.j == point.j)
                 {
                     break;
                 }
@@ -20,46 +19,44 @@ namespace AdventOfCode._2019.Day03
             return stepCount;
         }
 
-        public static List<(int, int)> TrackWire(IEnumerable<string> wirePath)
+        public static List<(int, int)> TrackWire(IEnumerable<WirePathSegment> wirePath)
         {
             List<(int, int)> coordinates = new List<(int, int)>();
 
             int i = 0, j = 0;
 
-            foreach (var step in wirePath)
-            {
-                char stepDirection = step[0];
-                int stepCount = int.Parse(step.Substring(1, step.Length - 1));
+            foreach (var segment in wirePath)
+            {                
                 int to = 0;
 
-                switch (stepDirection)
+                switch (segment.Direction)
                 {
-                    case 'R':
-                        to = i + stepCount;
+                    case WirePathSegmentDirection.Right:
+                        to = i + segment.StepCount;
                         do
                         {
                             coordinates.Add(ValueTuple.Create(++i, j));
                         }
                         while (i < to);
                         break;
-                    case 'L':
-                        to = i - stepCount;
+                    case WirePathSegmentDirection.Left:
+                        to = i - segment.StepCount;
                         do
                         {
                             coordinates.Add(ValueTuple.Create(--i, j));
                         }
                         while (i > to);
                         break;
-                    case 'U':
-                        to = j + stepCount;
+                    case WirePathSegmentDirection.Up:
+                        to = j + segment.StepCount;
                         do
                         {
                             coordinates.Add(ValueTuple.Create(i, ++j));
                         }
                         while (j < to);
                         break;
-                    case 'D':
-                        to = j - stepCount;
+                    case WirePathSegmentDirection.Down:
+                        to = j - segment.StepCount;
                         do
                         {
                             coordinates.Add(ValueTuple.Create(i, --j));
