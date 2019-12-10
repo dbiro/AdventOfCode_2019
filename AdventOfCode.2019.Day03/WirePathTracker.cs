@@ -33,35 +33,31 @@ namespace AdventOfCode._2019.Day03
                 {
                     case WirePathSegmentDirection.Right:
                         to = i + segment.StepCount;
-                        do
+                        while (i < to)
                         {
                             coordinates.Add(ValueTuple.Create(++i, j));
                         }
-                        while (i < to);
                         break;
                     case WirePathSegmentDirection.Left:
                         to = i - segment.StepCount;
-                        do
+                        while (i > to)
                         {
                             coordinates.Add(ValueTuple.Create(--i, j));
                         }
-                        while (i > to);
                         break;
                     case WirePathSegmentDirection.Up:
                         to = j + segment.StepCount;
-                        do
+                        while (j < to)
                         {
                             coordinates.Add(ValueTuple.Create(i, ++j));
                         }
-                        while (j < to);
                         break;
                     case WirePathSegmentDirection.Down:
                         to = j - segment.StepCount;
-                        do
+                        while (j > to)
                         {
                             coordinates.Add(ValueTuple.Create(i, --j));
                         }
-                        while (j > to);
                         break;
                     default:
                         throw new InvalidOperationException();
