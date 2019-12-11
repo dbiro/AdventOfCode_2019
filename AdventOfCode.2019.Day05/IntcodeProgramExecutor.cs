@@ -49,6 +49,7 @@ namespace AdventOfCode._2019.Day05
                     break;
                 case 99:
                     OutputWriter.WriteLine("Program halted");
+                    modifiedProgram = program;
                     halted = true;
                     break;  // program halted
                 default:
@@ -57,7 +58,7 @@ namespace AdventOfCode._2019.Day05
 
             if (halted)
             {
-                return program;
+                return modifiedProgram;
             }
             else
             {
