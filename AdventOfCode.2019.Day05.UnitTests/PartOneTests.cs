@@ -5,10 +5,10 @@ using System.Text;
 namespace AdventOfCode._2019.Day05.UnitTests
 {
     [TestClass]
-    public class IntcodeProgramExecutorTests
+    public class PartOneTests
     {
         [TestMethod]
-        public void TestCase_01()
+        public void PartOne_TestCase_01()
         {
             int[] input = new int[] { 1, 0, 0, 0, 99 };
             int[] output = IntcodeProgramExecutor.Execute(input);
@@ -21,7 +21,7 @@ namespace AdventOfCode._2019.Day05.UnitTests
         }
 
         [TestMethod]
-        public void TestCase_02()
+        public void PartOne_TestCase_02()
         {
             int[] input = new int[] { 2, 3, 0, 3, 99 };
             int[] output = IntcodeProgramExecutor.Execute(input);
@@ -34,7 +34,7 @@ namespace AdventOfCode._2019.Day05.UnitTests
         }
 
         [TestMethod]
-        public void TestCase_03()
+        public void PartOne_TestCase_03()
         {
             int[] input = new int[] { 2, 4, 4, 5, 99, 0 };
             int[] output = IntcodeProgramExecutor.Execute(input);
@@ -48,7 +48,7 @@ namespace AdventOfCode._2019.Day05.UnitTests
         }
 
         [TestMethod]
-        public void TestCase_04()
+        public void PartOne_TestCase_04()
         {
             int[] input = new int[] { 1, 1, 1, 4, 99, 5, 6, 0, 99 };
             int[] output = IntcodeProgramExecutor.Execute(input);
@@ -65,7 +65,7 @@ namespace AdventOfCode._2019.Day05.UnitTests
         }
 
         [TestMethod]
-        public void TestCase_05()
+        public void PartOne_TestCase_05()
         {
             int[] input = new int[] { 1002, 4, 3, 4, 33 };
             int[] output = IntcodeProgramExecutor.Execute(input);
@@ -78,7 +78,7 @@ namespace AdventOfCode._2019.Day05.UnitTests
         }
 
         [TestMethod]
-        public void TestCase_06()
+        public void PartOne_TestCase_06()
         {
             int[] input = new int[] { 1101, 100, -1, 4, 0 };
             int[] output = IntcodeProgramExecutor.Execute(input);
@@ -91,13 +91,13 @@ namespace AdventOfCode._2019.Day05.UnitTests
         }
 
         [TestMethod]
-        public void TestCase_07()
+        public void PartOne_TestCase_07()
         {
             int[] input = new int[] { 3, 0, 4, 0, 99 };
-            var stringBuilder = new StringBuilder();
+            var outputBuilder = new StringBuilder();
 
             IntcodeProgramExecutor.InputReader = new StringReader("11");
-            IntcodeProgramExecutor.OutputWriter = new StringWriter(stringBuilder);
+            IntcodeProgramExecutor.OutputWriter = new StringWriter(outputBuilder);
 
             int[] output = IntcodeProgramExecutor.Execute(input);
 
@@ -107,7 +107,7 @@ namespace AdventOfCode._2019.Day05.UnitTests
             Assert.AreEqual(0, output[3]);
             Assert.AreEqual(99, output[4]);
 
-            Assert.IsTrue(stringBuilder.ToString().Contains("Output value: 11"));
+            Assert.IsTrue(outputBuilder.ToString().Contains("Output value: 11"));
         }
     }
 }
