@@ -6,7 +6,8 @@ namespace AdventOfCode._2019.Day05
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Hello World!");
+            int[] input = InputReader.Read();
+            Console.WriteLine(input.Length);
         }
     }
 }
