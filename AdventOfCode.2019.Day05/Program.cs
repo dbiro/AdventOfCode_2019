@@ -6,8 +6,11 @@ namespace AdventOfCode._2019.Day05
     {
         static void Main(string[] args)
         {
-            int[] input = InputReader.Read();
-            Console.WriteLine(input.Length);
+            int[] program = InputReader.Read();                                   
+            
+            int[] result = IntcodeProgramExecutor.Execute(program);
+
+            Console.WriteLine(string.Join(',', result));
         }
     }
 }

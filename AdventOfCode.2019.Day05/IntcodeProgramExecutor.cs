@@ -1,55 +1,136 @@
 ﻿using System;
+using System.IO;
 using System.Linq;
 
 namespace AdventOfCode._2019.Day05
 {
     public static class IntcodeProgramExecutor
     {
-        public static int[] Execute(int[] input)
+        public static TextReader InputReader { get; set; }
+        public static TextWriter OutputWriter { get; set; }
+
+        static IntcodeProgramExecutor()
         {
-            return Execute(input, 0);
+            InputReader = Console.In;
+            OutputWriter = Console.Out;
         }
 
-        private static int[] Execute(int[] input, int opCodeIndex)
+        public static int[] Execute(int[] program)
         {
-            int opCode = input[opCodeIndex];
+            return Execute(program, 0);
+        }
 
-            int[] output = null;
+        private static int[] Execute(int[] program, int instructionIndex)
+        {
+            int[] modifiedProgram = null;
+            int nextInstructionIndex = 0;
+            bool halted = false;
 
-            switch (opCode)
+            var instructionMode = ParseInstructionMode(program[instructionIndex]);
+
+            switch (instructionMode.OpCode)
             {
                 case 1:
-                    output = Execute(input, opCodeIndex, (a, b) => a + b);
+                    modifiedProgram = ExecuteAddInstruction(program, instructionIndex, instructionMode.FirstArgMode, instructionMode.SecondArgMode);
+                    nextInstructionIndex = instructionIndex + 4;
                     break;
                 case 2:
-                    output = Execute(input, opCodeIndex, (a, b) => a * b);
+                    modifiedProgram = ExecuteMutiplyInstruction(program, instructionIndex, instructionMode.FirstArgMode, instructionMode.SecondArgMode);
+                    nextInstructionIndex = instructionIndex + 4;
+                    break;
+                case 3:
+                    modifiedProgram = ExecuteReadInputInstruction(program, instructionIndex);
+                    nextInstructionIndex = instructionIndex + 2;
+                    break;
+                case 4:
+                    ExecuteWriteOutputInstruction(program, instructionIndex, instructionMode.FirstArgMode);
+                    nextInstructionIndex = instructionIndex + 2;
+                    modifiedProgram = program;
                     break;
                 case 99:
+                    OutputWriter.WriteLine("Program halted");
+                    halted = true;
                     break;  // program halted
                 default:
-                    throw new InvalidOperationException($"Invalid opcode: {opCode}");
+                    throw new InvalidOperationException($"Invalid opcode: {instructionMode.OpCode}");
             }
 
-            if (output == null)
+            if (halted)
             {
-                return input;
+                return program;
             }
             else
             {
-                return Execute(output, opCodeIndex + 4);
+                return Execute(modifiedProgram, nextInstructionIndex);
             }
         }
 
-        private static int[] Execute(int[] input, int opCodeIndex, Func<int, int, int> calculator)
+        private static int GetParameter(int[] program, int paramIndex, int mode)
         {
-            int firsArgIndex = input[opCodeIndex + 1];
-            int secondArgIndex = input[opCodeIndex + 2];
-            int resultIndex = input[opCodeIndex + 3];
+            switch (mode)
+            {
+                case 0: // position mode
+                    return program[program[paramIndex]];
+                case 1: // immediate mode
+                    return program[paramIndex];
+                default:
+                    throw new ArgumentException($"Invalid parameter mode: {mode}, paramIndex: {paramIndex}");
+            }
+        }
 
-            int result = calculator(input[firsArgIndex], input[secondArgIndex]);
-            input[resultIndex] = result;
+        private static (int OpCode, int FirstArgMode, int SecondArgMode, int ResultArgMode) ParseInstructionMode(int instructionMode)
+        {
+            string instructionModeString = instructionMode.ToString();
 
-            return input.ToArray();
+            int opCode = instructionModeString.Length == 1 ? int.Parse(instructionModeString) : int.Parse(instructionModeString.Substring(instructionModeString.Length - 2, 2));
+            int firsArgMode = instructionModeString.Length > 2 ? int.Parse(new string(instructionModeString[instructionModeString.Length - 3], 1)) : 0;
+            int secondArgMode = instructionModeString.Length > 3 ? int.Parse(new string(instructionModeString[instructionModeString.Length - 4], 1)) : 0;
+            int resultArgMode = instructionModeString.Length > 4 ? int.Parse(new string(instructionModeString[instructionModeString.Length - 5], 1)) : 0;
+
+            return (opCode, firsArgMode, secondArgMode, resultArgMode);
+        }
+
+        private static int[] ExecuteReadInputInstruction(int[] program, int instructionIndex)
+        {
+            OutputWriter.WriteLine("Provide an input value:");
+            int inputValue = int.Parse(InputReader.ReadLine());
+
+            int inputValueIndex = program[instructionIndex + 1];
+            program[inputValueIndex] = inputValue;
+
+            return program;
+        }
+
+        private static void ExecuteWriteOutputInstruction(int[] program, int instructionIndex, int paramMode)
+        {
+            int outputValue = GetParameter(program, instructionIndex + 1, paramMode);
+            OutputWriter.WriteLine($"Output value: {outputValue}");
+        }
+
+        private static int[] ExecuteAddInstruction(int[] program, int instructionIndex, int firsParamMode, int secondParamMode)
+        {                        
+            int resultIndex = program[instructionIndex + 3];
+
+            int param1 = GetParameter(program, instructionIndex + 1, firsParamMode);
+            int param2 = GetParameter(program, instructionIndex + 2, secondParamMode);
+
+            int result = param1 + param2;
+            program[resultIndex] = result;
+
+            return program;
+        }
+
+        private static int[] ExecuteMutiplyInstruction(int[] program, int instructionIndex, int firsParamMode, int secondParamMode)
+        {
+            int resultIndex = program[instructionIndex + 3];
+
+            int param1 = GetParameter(program, instructionIndex + 1, firsParamMode);
+            int param2 = GetParameter(program, instructionIndex + 2, secondParamMode);
+
+            int result = param1 * param2;
+            program[resultIndex] = result;
+
+            return program;
         }
     }
 }
