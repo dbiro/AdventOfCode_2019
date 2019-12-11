@@ -6,11 +6,11 @@ namespace AdventOfCode._2019.Day03
 {
     public static class WirePathParser
     {
-        public static IEnumerable<WirePathSegment> Parse(string wirePath)
+        public static IEnumerable<WirePathInstruction> Parse(string wirePath)
         {
             return wirePath
                 .Split(",", StringSplitOptions.RemoveEmptyEntries)
-                .Select(p => new WirePathSegment(p.Trim()))
+                .Select(p => new WirePathInstruction(p.Trim()))
                 .ToList();
         }
     }

@@ -19,7 +19,7 @@ namespace AdventOfCode._2019.Day03
             return stepCount;
         }
 
-        public static List<(int, int)> TrackWire(IEnumerable<WirePathSegment> wirePath)
+        public static List<(int, int)> TrackWire(IEnumerable<WirePathInstruction> wirePath)
         {
             List<(int, int)> coordinates = new List<(int, int)>();
 
@@ -31,28 +31,28 @@ namespace AdventOfCode._2019.Day03
 
                 switch (segment.Direction)
                 {
-                    case WirePathSegmentDirection.Right:
+                    case WirePathInstructionDirection.Right:
                         to = i + segment.StepCount;
                         while (i < to)
                         {
                             coordinates.Add(ValueTuple.Create(++i, j));
                         }
                         break;
-                    case WirePathSegmentDirection.Left:
+                    case WirePathInstructionDirection.Left:
                         to = i - segment.StepCount;
                         while (i > to)
                         {
                             coordinates.Add(ValueTuple.Create(--i, j));
                         }
                         break;
-                    case WirePathSegmentDirection.Up:
+                    case WirePathInstructionDirection.Up:
                         to = j + segment.StepCount;
                         while (j < to)
                         {
                             coordinates.Add(ValueTuple.Create(i, ++j));
                         }
                         break;
-                    case WirePathSegmentDirection.Down:
+                    case WirePathInstructionDirection.Down:
                         to = j - segment.StepCount;
                         while (j > to)
                         {
