@@ -1,9 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 namespace AdventOfCode._2019.Day06
 {
+    class OrbitMap : Dictionary<string, ICollection<string>>
+    { }
+
     class Program
     {
         static void Main(string[] args)
@@ -22,10 +26,32 @@ namespace AdventOfCode._2019.Day06
             //    "D)I",
             //    "E)J",
             //    "J)K",
-            //    "K)L"
+            //    "K)L",
+            //    "K)YOU",
+            //    "I)SAN"
             //};
 
-            var orbitMap = new Dictionary<string, ICollection<string>>();
+            var orbitMap = ParseOrbitMap(orbits);
+
+            int checksum = CalculateChecksumForOrbitMap(orbitMap);
+            Console.WriteLine(checksum);
+
+            var visitedObjectsYOU = FindSpaceObjectInOrbitMap("YOU", orbitMap).ToList();
+            //Console.WriteLine(visitedObjectsYOU.Count);
+            //Console.WriteLine(string.Join(',', visitedObjectsYOU));
+
+            var visitedObjectsSAN = FindSpaceObjectInOrbitMap("SAN", orbitMap).ToList();
+            //Console.WriteLine(visitedObjectsSAN.Count);
+            //Console.WriteLine(string.Join(',', visitedObjectsSAN));
+
+            int commonVisitedObjectCount = visitedObjectsYOU.Intersect(visitedObjectsSAN).Count();
+            int minimumTransfersRequired = visitedObjectsYOU.Count + visitedObjectsSAN.Count - 2 * commonVisitedObjectCount;
+            Console.WriteLine(minimumTransfersRequired);
+        }
+
+        static OrbitMap ParseOrbitMap(string[] orbits)
+        {
+            var orbitMap = new OrbitMap();
             foreach (var orbit in orbits)
             {
                 string[] spaceObjects = orbit.Split(")");
@@ -35,34 +61,68 @@ namespace AdventOfCode._2019.Day06
                 }
                 orbitMap[spaceObjects[0]].Add(spaceObjects[1]);
             }
-
-            int orbitCount = TraverseOrbitMap(orbitMap);
-
-            Console.WriteLine(orbitCount);
+            return orbitMap;
         }
 
-        static int TraverseOrbitMap(Dictionary<string, ICollection<string>> orbitMap)
+        static int CalculateChecksumForOrbitMap(OrbitMap orbitMap)
         {
-            int orbitCount = 0;
-            TraverseSpaceObject("COM", orbitMap, 0, ref orbitCount);
-            return orbitCount;
+            return CalculateChecksumForSpaceObject("COM", orbitMap, 0);
         }
 
-        static void TraverseSpaceObject(string spaceObject, Dictionary<string, ICollection<string>> orbitMap, int depth, ref int orbitCount)
-        {            
+        static int CalculateChecksumForSpaceObject(string spaceObject, OrbitMap orbitMap, int depth)
+        {
             if (orbitMap.ContainsKey(spaceObject))
             {
-                orbitCount += depth;
+                int orbitCount = depth;
 
                 foreach (var child in orbitMap[spaceObject])
                 {
-                    TraverseSpaceObject(child, orbitMap, depth + 1, ref orbitCount);
+                    orbitCount += CalculateChecksumForSpaceObject(child, orbitMap, depth + 1);
                 }
+
+                return orbitCount;
             }
             else
-            {                
-                orbitCount += depth;
-            }            
+            {
+                return depth;
+            }
+        }
+
+        static IEnumerable<string> FindSpaceObjectInOrbitMap(string objectToFind, OrbitMap orbitMap)
+        {
+            var visitedObjects = new HashSet<string>();
+            FindSpaceObject("COM", objectToFind, orbitMap, visitedObjects);
+            return visitedObjects;
+        }
+
+        static bool FindSpaceObject(string spaceObject, string spaceObjectToFind, OrbitMap orbitMap, HashSet<string> visitedObjects)
+        {
+            if (spaceObject.Equals(spaceObjectToFind))
+            {
+                return true;
+            }
+                       
+            if (orbitMap.ContainsKey(spaceObject))
+            {
+                visitedObjects.Add(spaceObject);
+                bool found = false;
+
+                foreach (var child in orbitMap[spaceObject])
+                {
+                    found |= FindSpaceObject(child, spaceObjectToFind, orbitMap, visitedObjects);
+                }
+
+                if (!found)
+                {
+                    visitedObjects.Remove(spaceObject);
+                }
+
+                return found;
+            }
+            else
+            {
+                return false;
+            }
         }
     }
 }
