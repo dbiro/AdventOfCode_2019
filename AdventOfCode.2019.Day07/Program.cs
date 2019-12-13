@@ -12,16 +12,18 @@ namespace AdventOfCode._2019.Day07
             //ImmutableArray<int> program = ImmutableArray.Create(new int[] { 3, 31, 3, 32, 1002, 32, 10, 32, 1001, 31, -2, 31, 1007, 31, 0, 33, 1002, 33, 7, 33, 1, 33, 31, 31, 1, 32, 31, 31, 4, 31, 99, 0, 0, 0 });
             ImmutableArray<int> program = ImmutableArray.Create(InputReader.Read());
 
-            int[][] programs = new int[][] { program.ToArray(), program.ToArray(), program.ToArray(), program.ToArray(), program.ToArray() };
-
             Queue<int> inputs = new Queue<int>(2);
             int currentOutput = 0;
             int maxOutput = 0;
             int[] phaseSettingsForMaxOutput = null;
 
-            IntcodeProgramExecutor.InputReader = () => inputs.Dequeue();
-            IntcodeProgramExecutor.OutputWriter = o => currentOutput = o;
+            Func<int> inputReader = () => inputs.Dequeue();
+            Action<int> outputWriter = o => currentOutput = o;
 
+            IntcodeProgram[] amplifiers = Enumerable.Range(0, 5)
+                .Select(i => new IntcodeProgram(program.ToArray(), inputReader, outputWriter))
+                .ToArray();
+                                    
             foreach (int phase1 in Enumerable.Range(0, 5))
                 foreach (int phase2 in Enumerable.Range(0, 5))
                     foreach (int phase3 in Enumerable.Range(0, 5))
@@ -39,7 +41,7 @@ namespace AdventOfCode._2019.Day07
                                     inputs.Enqueue(currentPhaseSettings[i]);
                                     inputs.Enqueue(currentOutput);
 
-                                    IntcodeProgramExecutor.Execute(programs[i]);
+                                    amplifiers[i].Execute();
                                 }
                                 if (currentOutput > maxOutput)
                                 {
