@@ -5,10 +5,13 @@ namespace AdventOfCode._2019.Day07
     public class IntcodeProgram
     {
         private readonly int[] program;
+        private int currentInstructionIndex;
 
-        public Func<int> InputReader { get; }
+        public Func<int?> InputReader { get; }
         public Action<int> OutputWriter { get; }
-        
+        public bool Halted { get; private set; }
+        public bool WaitingForInput { get; private set; }
+
         public IntcodeProgram(int[] program)
         {
             InputReader = () => int.Parse(Console.ReadLine());
@@ -16,7 +19,7 @@ namespace AdventOfCode._2019.Day07
             this.program = program;
         }
 
-        public IntcodeProgram(int[] program, Func<int> inputReader, Action<int> outputWriter)
+        public IntcodeProgram(int[] program, Func<int?> inputReader, Action<int> outputWriter)
         {
             InputReader = inputReader;
             OutputWriter = outputWriter;
@@ -25,14 +28,12 @@ namespace AdventOfCode._2019.Day07
 
         public void Execute()
         {
-            Execute(0);
+            Execute(currentInstructionIndex);
         }
 
         private void Execute(int instructionIndex)
         {
             int nextInstructionIndex = instructionIndex;
-            bool halted = false;
-
             var instructionMode = ParseInstructionMode(program[instructionIndex]);
 
             switch (instructionMode.OpCode)
@@ -45,6 +46,7 @@ namespace AdventOfCode._2019.Day07
                     break;
                 case 3:
                     nextInstructionIndex = ExecuteReadInputInstruction(instructionIndex);
+                    WaitingForInput = nextInstructionIndex == instructionIndex;
                     break;
                 case 4:
                     nextInstructionIndex = ExecuteWriteOutputInstruction(instructionIndex, instructionMode.FirstParamMode);
@@ -62,18 +64,20 @@ namespace AdventOfCode._2019.Day07
                     nextInstructionIndex = ExecuteEqualsInstruction(instructionIndex, instructionMode.FirstParamMode, instructionMode.SecondParamMode);
                     break;
                 case 99:
-                    halted = true;
+                    Halted = true;
                     break;  // program halted
                 default:
                     throw new InvalidOperationException($"Invalid opcode: {instructionMode.OpCode}");
             }
 
-            if (!halted)
+            currentInstructionIndex = instructionIndex;
+
+            if (!WaitingForInput && !Halted)
             {
                 Execute(nextInstructionIndex);
-            }
+            }            
         }
-                
+
         private int ReadParameterValue(int paramIndex, int mode)
         {
             switch (mode)
@@ -163,19 +167,25 @@ namespace AdventOfCode._2019.Day07
         }
 
         private int ExecuteReadInputInstruction(int instructionIndex)
-        {            
-            int inputValue = InputReader();
+        {
+            int? inputValue = InputReader();
+            if (inputValue.HasValue)
+            {
+                int inputValueIndex = program[instructionIndex + 1];
+                program[inputValueIndex] = inputValue.Value;
 
-            int inputValueIndex = program[instructionIndex + 1];
-            program[inputValueIndex] = inputValue;
-
-            return instructionIndex + 2;
+                return instructionIndex + 2;
+            }
+            else
+            {
+                return instructionIndex;
+            }
         }
 
         private int ExecuteWriteOutputInstruction(int instructionIndex, int paramMode)
         {
             int outputValue = ReadParameterValue(instructionIndex + 1, paramMode);
-            
+
             OutputWriter(outputValue);
 
             return instructionIndex + 2;
