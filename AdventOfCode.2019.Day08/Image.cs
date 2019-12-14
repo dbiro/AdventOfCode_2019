@@ -5,11 +5,7 @@ using System.Linq;
 namespace AdventOfCode._2019.Day08
 {
     class Image : IEnumerable<Layer>
-    {
-        private const char BlackDigit = '0';
-        private const char WhiteDigit = '1';
-        private const char TransparentDigit = '2';
-
+    {        
         private readonly List<Layer> layers;
         private readonly int width;
         private readonly int height;
@@ -71,7 +67,7 @@ namespace AdventOfCode._2019.Day08
                 {
                     foreach (var layer in layers)
                     {
-                        if (renderedLayerDigits[i] == BlackDigit || renderedLayerDigits[i] == WhiteDigit)
+                        if (renderedLayerDigits[i] == Layer.BlackDigit || renderedLayerDigits[i] == Layer.WhiteDigit)
                         {
                             break;
                         }

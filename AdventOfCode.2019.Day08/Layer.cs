@@ -7,6 +7,10 @@ namespace AdventOfCode._2019.Day08
 {
     class Layer : IEnumerable<char>
     {
+        public const char BlackDigit = '0';
+        public const char WhiteDigit = '1';
+        public const char TransparentDigit = '2';
+
         private readonly List<char> _digits;
         private readonly int width;
         private readonly int height;
@@ -66,7 +70,7 @@ namespace AdventOfCode._2019.Day08
             {
                 char[] rowDigits = _digits.Skip(j * width).Take(width).ToArray();
                 string row = new string(rowDigits);
-                string formattedRow = row.Replace('0', ' ').Replace('1', '#').Replace('2', ' ');
+                string formattedRow = row.Replace(BlackDigit, ' ').Replace(WhiteDigit, '#').Replace(TransparentDigit, ' ');
                 yield return formattedRow;
             }
         }
