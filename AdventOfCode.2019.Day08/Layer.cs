@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace AdventOfCode._2019.Day08
 {
-    class Layer : IEnumerable<char>
+    class Layer: IEnumerable<char>
     {
         public const char BlackDigit = '0';
         public const char WhiteDigit = '1';
@@ -74,7 +74,7 @@ namespace AdventOfCode._2019.Day08
                 yield return formattedRow;
             }
         }
-
+                
         public char this[int index] => _digits[index];
 
         public IEnumerator<char> GetEnumerator()

@@ -24,26 +24,13 @@ namespace AdventOfCode._2019.Day08
 
             Image image = Image.Load(input, pictureWidth, pictureHeight);
 
-            Layer layerWithFewestZeroDigits = FindLayerWithFewestZeroDigits(image);
-            Console.WriteLine(layerWithFewestZeroDigits.NumberOfOneDigits * layerWithFewestZeroDigits.NumberOfTwoDigits);
+            int checksum = image.CalculateChecksum();
+            Console.WriteLine(checksum);
 
             Layer renderedLayer = image.Render();
             IEnumerable<string> layerRows = renderedLayer.Render();
 
             layerRows.ToList().ForEach(r => Console.WriteLine(r));
-        }
-
-        static Layer FindLayerWithFewestZeroDigits(IEnumerable<Layer> layers)
-        {
-            Layer foundLayer = layers.First();
-            foreach (var layer in layers)
-            {
-                if (layer.NumberOfZeroDigits < foundLayer.NumberOfZeroDigits)
-                {
-                    foundLayer = layer;
-                }
-            }
-            return foundLayer;
-        }
+        }                
     }
 }

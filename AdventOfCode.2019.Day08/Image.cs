@@ -45,15 +45,24 @@ namespace AdventOfCode._2019.Day08
 
             return picture;
         }
-
-        public IEnumerator<Layer> GetEnumerator()
+               
+        private Layer FindLayerWithFewestZeroDigits()
         {
-            return layers.GetEnumerator();
+            Layer foundLayer = layers.First();
+            foreach (var layer in layers)
+            {
+                if (layer.NumberOfZeroDigits < foundLayer.NumberOfZeroDigits)
+                {
+                    foundLayer = layer;
+                }
+            }
+            return foundLayer;
         }
 
-        IEnumerator IEnumerable.GetEnumerator()
+        public int CalculateChecksum()
         {
-            return layers.GetEnumerator();
+            Layer layerWithFewestZeroDigits = FindLayerWithFewestZeroDigits();
+            return layerWithFewestZeroDigits.NumberOfOneDigits * layerWithFewestZeroDigits.NumberOfTwoDigits;
         }
 
         public Layer Render()
@@ -80,6 +89,16 @@ namespace AdventOfCode._2019.Day08
             }
 
             return new Layer(width, height, renderedLayerDigits);
+        }
+
+        public IEnumerator<Layer> GetEnumerator()
+        {
+            return layers.GetEnumerator();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return layers.GetEnumerator();
         }
     }
 }
