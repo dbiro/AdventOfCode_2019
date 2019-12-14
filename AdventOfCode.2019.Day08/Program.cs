@@ -28,9 +28,7 @@ namespace AdventOfCode._2019.Day08
             Console.WriteLine(checksum);
 
             Layer renderedLayer = image.Render();
-            IEnumerable<string> layerRows = renderedLayer.Render();
-
-            layerRows.ToList().ForEach(r => Console.WriteLine(r));
+            renderedLayer.Render(Console.Out);
         }                
     }
 }

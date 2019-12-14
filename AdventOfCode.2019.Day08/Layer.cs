@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 
 namespace AdventOfCode._2019.Day08
@@ -64,18 +65,16 @@ namespace AdventOfCode._2019.Day08
             _digits.Add(digit);
         }
 
-        public IEnumerable<string> Render()
+        public void Render(TextWriter writer) 
         {
             for (int j = 0; j < height; j++)
             {
                 char[] rowDigits = _digits.Skip(j * width).Take(width).ToArray();
                 string row = new string(rowDigits);
                 string formattedRow = row.Replace(BlackDigit, ' ').Replace(WhiteDigit, '#').Replace(TransparentDigit, ' ');
-                yield return formattedRow;
+                writer.WriteLine(formattedRow);
             }
         }
-                
-        public char this[int index] => _digits[index];
 
         public IEnumerator<char> GetEnumerator()
         {

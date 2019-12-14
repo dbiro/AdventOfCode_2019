@@ -67,23 +67,20 @@ namespace AdventOfCode._2019.Day08
 
         public Layer Render()
         {
-            // create empty (dont care) layer
-            char[] renderedLayerDigits = Enumerable.Repeat('-', width * height).ToArray();
+            // create empty (transparent) layer
+            char[] renderedLayerDigits = Enumerable.Repeat(Layer.TransparentDigit, width * height).ToArray();
 
-            for (int j = 0; j < height; j++)
+            foreach (var layer in layers.Select(l => l.ToArray()))
             {
-                for (int i = j * width; i < j * width + width; i++)
+                for (int i = 0; i < layer.Length; i++)
                 {
-                    foreach (var layer in layers)
+                    if (renderedLayerDigits[i] == Layer.BlackDigit || renderedLayerDigits[i] == Layer.WhiteDigit)
                     {
-                        if (renderedLayerDigits[i] == Layer.BlackDigit || renderedLayerDigits[i] == Layer.WhiteDigit)
-                        {
-                            break;
-                        }
-                        else
-                        {
-                            renderedLayerDigits[i] = layer[i];
-                        }
+                        continue;
+                    }
+                    else
+                    {
+                        renderedLayerDigits[i] = layer[i];
                     }
                 }
             }
