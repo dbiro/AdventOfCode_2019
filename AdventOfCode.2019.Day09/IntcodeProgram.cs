@@ -1,12 +1,15 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace AdventOfCode._2019.Day09
 {
     public class IntcodeProgram
     {
-        private readonly long[] program;
+        private readonly Dictionary<long, long> program;
         private long currentInstructionIndex;
         private long relativeBase;
+        private long initialProgramSize;
 
         public Func<long?> InputReader { get; }
         public Action<long> OutputWriter { get; }
@@ -16,110 +19,159 @@ namespace AdventOfCode._2019.Day09
         public IntcodeProgram(long[] program)
         {
             InputReader = () => int.Parse(Console.ReadLine());
-            OutputWriter = o => Console.WriteLine(0);
-            this.program = program;
+            OutputWriter = o => Console.WriteLine(o);
+            this.program = new Dictionary<long, long>(program.Select((v, i) => new KeyValuePair<long, long>(i, v)), null);
+            initialProgramSize = program.Length;
         }
 
         public IntcodeProgram(long[] program, Func<long?> inputReader, Action<long> outputWriter)
+            : this(program)
         {
             InputReader = inputReader;
             OutputWriter = outputWriter;
-            this.program = program;
         }
 
         public void Execute()
         {
-            Execute(currentInstructionIndex);
+            while (!WaitingForInput && !Halted)
+            {
+                Execute(currentInstructionIndex);
+            }
         }
 
         private void Execute(long instructionIndex)
         {
-            long nextInstructionIndex = instructionIndex;
-            var instructionMode = ParseInstructionMode(program[instructionIndex]);
+            long nextInstructionIndex = -1;
 
-            switch (instructionMode.OpCode)
+            var parameterModes = ParseInstructionParameterModes(program[instructionIndex]);
+            int opCode = ParseInstructionOpCode(program[instructionIndex]);
+
+            switch (opCode)
             {
                 case 1:
-                    nextInstructionIndex = ExecuteAddInstruction(instructionIndex, instructionMode.FirstParamMode, instructionMode.SecondParamMode);
+                    nextInstructionIndex = ExecuteAddInstruction(instructionIndex, parameterModes);
                     break;
                 case 2:
-                    nextInstructionIndex = ExecuteMutiplyInstruction(instructionIndex, instructionMode.FirstParamMode, instructionMode.SecondParamMode);
+                    nextInstructionIndex = ExecuteMutiplyInstruction(instructionIndex, parameterModes);
                     break;
                 case 3:
-                    nextInstructionIndex = ExecuteReadInputInstruction(instructionIndex);
+                    nextInstructionIndex = ExecuteReadInputInstruction(instructionIndex, parameterModes);
                     WaitingForInput = nextInstructionIndex == instructionIndex;
                     break;
                 case 4:
-                    nextInstructionIndex = ExecuteWriteOutputInstruction(instructionIndex, instructionMode.FirstParamMode);
+                    nextInstructionIndex = ExecuteWriteOutputInstruction(instructionIndex, parameterModes);
                     break;
                 case 5:
-                    nextInstructionIndex = ExecuteJumpIfTrueInstruction(instructionIndex, instructionMode.FirstParamMode, instructionMode.SecondParamMode);
+                    nextInstructionIndex = ExecuteJumpIfTrueInstruction(instructionIndex, parameterModes);
                     break;
                 case 6:
-                    nextInstructionIndex = ExecuteJumpIfFalseInstruction(instructionIndex, instructionMode.FirstParamMode, instructionMode.SecondParamMode);
+                    nextInstructionIndex = ExecuteJumpIfFalseInstruction(instructionIndex, parameterModes);
                     break;
                 case 7:
-                    nextInstructionIndex = ExecuteLessThanInstruction(instructionIndex, instructionMode.FirstParamMode, instructionMode.SecondParamMode);
+                    nextInstructionIndex = ExecuteLessThanInstruction(instructionIndex, parameterModes);
                     break;
                 case 8:
-                    nextInstructionIndex = ExecuteEqualsInstruction(instructionIndex, instructionMode.FirstParamMode, instructionMode.SecondParamMode);
+                    nextInstructionIndex = ExecuteEqualsInstruction(instructionIndex, parameterModes);
                     break;
                 case 9:
-                    nextInstructionIndex = ExecuteAdjustRelativeBaseInstruction(instructionIndex, instructionMode.FirstParamMode);
+                    nextInstructionIndex = ExecuteAdjustRelativeBaseInstruction(instructionIndex, parameterModes);
                     break;
                 case 99:
                     Halted = true;
                     break;  // program halted
                 default:
-                    throw new InvalidOperationException($"Invalid opcode: {instructionMode.OpCode}");
+                    throw new InvalidOperationException($"Invalid opcode: {opCode}");
             }
 
-            currentInstructionIndex = instructionIndex;
-
-            if (!WaitingForInput && !Halted)
+            if (!Halted)
             {
-                Execute(nextInstructionIndex);
-            }            
+                currentInstructionIndex = nextInstructionIndex;
+            }
         }
 
-        private long ReadParameterValue(long paramIndex, int mode)
+        private long DeterminePositionFromParameterMode(long paramIndex, InstructionParameterMode mode)
         {
+            long position;
+
             switch (mode)
             {
-                case 0: // position mode
-                    return program[program[paramIndex]];
-                case 1: // immediate mode
-                    return program[paramIndex];
-                case 2:
-                    return program[program[paramIndex] + relativeBase];
+                case InstructionParameterMode.Position: // position mode
+                    position = program[paramIndex];
+                    break;
+                case InstructionParameterMode.Immediate: // immediate mode
+                    position = paramIndex;
+                    break;
+                case InstructionParameterMode.Relative:
+                    position = program[paramIndex] + relativeBase;
+                    break;
                 default:
                     throw new ArgumentException($"Invalid parameter mode: {mode}, paramIndex: {paramIndex}");
             }
+
+            if (position < 0)
+            {
+                throw new ArgumentOutOfRangeException("Can not read value from memory! Memory position van not be negative!");
+            }
+
+            return position;
         }
 
-        private (int OpCode, int FirstParamMode, int SecondParamMode) ParseInstructionMode(long instructionMode)
+        private long ReadParameterValue(long paramIndex, InstructionParameterMode mode)
         {
-            string instructionModeString = instructionMode.ToString();
-
-            int opCode = instructionModeString.Length == 1 ? int.Parse(instructionModeString) : int.Parse(instructionModeString.Substring(instructionModeString.Length - 2, 2));
-            int firsParamMode = instructionModeString.Length > 2 ? int.Parse(new string(instructionModeString[instructionModeString.Length - 3], 1)) : 0;
-            int secondParamMode = instructionModeString.Length > 3 ? int.Parse(new string(instructionModeString[instructionModeString.Length - 4], 1)) : 0;
-
-            return (opCode, firsParamMode, secondParamMode);
+            long position = DeterminePositionFromParameterMode(paramIndex, mode);
+            return program.ContainsKey(position) ? program[position] : 0;
         }
 
-        private long ExecuteAdjustRelativeBaseInstruction(long instructionIndex, int firstParamMode)
+        private void WriteValue(long paramIndex, InstructionParameterMode mode, long value)
         {
-            long firstParam = ReadParameterValue(instructionIndex + 1, firstParamMode);
-            relativeBase = firstParam;
+            long inputValuePosition = DeterminePositionFromParameterMode(paramIndex, mode);
+
+            if (inputValuePosition < 0)
+            {
+                throw new ArgumentOutOfRangeException("Can not write value in memory! Memory position van not be negative!");
+            }
+
+            program[inputValuePosition] = value;
+        }
+
+        private int ParseInstructionOpCode(long instruction)
+        {
+            string instructionModeString = instruction.ToString();
+
+            return instructionModeString.Length == 1 ? int.Parse(instructionModeString) : int.Parse(instructionModeString.Substring(instructionModeString.Length - 2, 2));
+        }
+
+        private InstructionParameterModes ParseInstructionParameterModes(long instruction)
+        {
+            string instructionModeString = instruction.ToString();
+                        
+            var firsParamMode = instructionModeString.Length > 2 ?
+                Enum.Parse<InstructionParameterMode>((new string(instructionModeString[instructionModeString.Length - 3], 1))) : 
+                InstructionParameterMode.Position;
+
+            var secondParamMode = instructionModeString.Length > 3 ?
+                Enum.Parse<InstructionParameterMode>((new string(instructionModeString[instructionModeString.Length - 4], 1))) :
+                InstructionParameterMode.Position;
+
+            var resultParamMode = instructionModeString.Length > 4 ?
+                Enum.Parse<InstructionParameterMode>((new string(instructionModeString[instructionModeString.Length - 5], 1))) :
+                InstructionParameterMode.Position;
+
+            return new InstructionParameterModes(firsParamMode, secondParamMode, resultParamMode);
+        }
+                
+        private long ExecuteAdjustRelativeBaseInstruction(long instructionIndex, InstructionParameterModes parameterModes)
+        {
+            long firstParam = ReadParameterValue(instructionIndex + 1, parameterModes.First);
+            relativeBase += firstParam;
 
             return instructionIndex + 2;
         }
 
-        private long ExecuteJumpIfTrueInstruction(long instructionIndex, int firstParamMode, int secondParamMode)
+        private long ExecuteJumpIfTrueInstruction(long instructionIndex, InstructionParameterModes parameterModes)
         {
-            long firstParam = ReadParameterValue(instructionIndex + 1, firstParamMode);
-            long secondParam = ReadParameterValue(instructionIndex + 2, secondParamMode);
+            long firstParam = ReadParameterValue(instructionIndex + 1, parameterModes.First);
+            long secondParam = ReadParameterValue(instructionIndex + 2, parameterModes.Second);
 
             if (firstParam != 0)
             {
@@ -131,10 +183,10 @@ namespace AdventOfCode._2019.Day09
             }
         }
 
-        private long ExecuteJumpIfFalseInstruction(long instructionIndex, int firstParamMode, int secondParamMode)
+        private long ExecuteJumpIfFalseInstruction(long instructionIndex, InstructionParameterModes parameterModes)
         {
-            long firstParam = ReadParameterValue(instructionIndex + 1, firstParamMode);
-            long secondParam = ReadParameterValue(instructionIndex + 2, secondParamMode);
+            long firstParam = ReadParameterValue(instructionIndex + 1, parameterModes.First);
+            long secondParam = ReadParameterValue(instructionIndex + 2, parameterModes.Second);
 
             if (firstParam == 0)
             {
@@ -146,48 +198,46 @@ namespace AdventOfCode._2019.Day09
             }
         }
 
-        private long ExecuteLessThanInstruction(long instructionIndex, int firstParamMode, int secondParamMode)
+        private long ExecuteLessThanInstruction(long instructionIndex, InstructionParameterModes parameterModes)
         {
-            long firstParam = ReadParameterValue(instructionIndex + 1, firstParamMode);
-            long secondParam = ReadParameterValue(instructionIndex + 2, secondParamMode);
+            long firstParam = ReadParameterValue(instructionIndex + 1, parameterModes.First);
+            long secondParam = ReadParameterValue(instructionIndex + 2, parameterModes.Second);
 
             if (firstParam < secondParam)
             {
-                program[program[instructionIndex + 3]] = 1;
+                WriteValue(instructionIndex + 3, parameterModes.Third, 1);
             }
             else
             {
-                program[program[instructionIndex + 3]] = 0;
+                WriteValue(instructionIndex + 3, parameterModes.Third, 0);
             }
 
             return instructionIndex + 4;
         }
 
-        private long ExecuteEqualsInstruction(long instructionIndex, int firstParamMode, int secondParamMode)
+        private long ExecuteEqualsInstruction(long instructionIndex, InstructionParameterModes parameterModes)
         {
-            long firstParam = ReadParameterValue(instructionIndex + 1, firstParamMode);
-            long secondParam = ReadParameterValue(instructionIndex + 2, secondParamMode);
+            long firstParam = ReadParameterValue(instructionIndex + 1, parameterModes.First);
+            long secondParam = ReadParameterValue(instructionIndex + 2, parameterModes.Second);
 
             if (firstParam == secondParam)
             {
-                program[program[instructionIndex + 3]] = 1;
+                WriteValue(instructionIndex + 3, parameterModes.Third, 1);
             }
             else
             {
-                program[program[instructionIndex + 3]] = 0;
+                WriteValue(instructionIndex + 3, parameterModes.Third, 0);
             }
 
             return instructionIndex + 4;
         }
 
-        private long ExecuteReadInputInstruction(long instructionIndex)
+        private long ExecuteReadInputInstruction(long instructionIndex, InstructionParameterModes parameterModes)
         {
             long? inputValue = InputReader();
             if (inputValue.HasValue)
-            {
-                long inputValueIndex = program[instructionIndex + 1];
-                program[inputValueIndex] = inputValue.Value;
-
+            {                
+                WriteValue(instructionIndex + 1, parameterModes.First, inputValue.Value);
                 return instructionIndex + 2;
             }
             else
@@ -196,31 +246,31 @@ namespace AdventOfCode._2019.Day09
             }
         }
 
-        private long ExecuteWriteOutputInstruction(long instructionIndex, int paramMode)
+        private long ExecuteWriteOutputInstruction(long instructionIndex, InstructionParameterModes parameterModes)
         {
-            long outputValue = ReadParameterValue(instructionIndex + 1, paramMode);
+            long outputValue = ReadParameterValue(instructionIndex + 1, parameterModes.First);
 
             OutputWriter(outputValue);
 
             return instructionIndex + 2;
         }
 
-        private long ExecuteAddInstruction(long instructionIndex, int firsParamMode, int secondParamMode)
+        private long ExecuteAddInstruction(long instructionIndex, InstructionParameterModes parameterModes)
         {
-            long param1 = ReadParameterValue(instructionIndex + 1, firsParamMode);
-            long param2 = ReadParameterValue(instructionIndex + 2, secondParamMode);
+            long param1 = ReadParameterValue(instructionIndex + 1, parameterModes.First);
+            long param2 = ReadParameterValue(instructionIndex + 2, parameterModes.Second);
 
-            program[program[instructionIndex + 3]] = param1 + param2;
+            WriteValue(instructionIndex + 3, parameterModes.Third, param1 + param2);
 
             return instructionIndex + 4;
         }
 
-        private long ExecuteMutiplyInstruction(long instructionIndex, int firsParamMode, int secondParamMode)
+        private long ExecuteMutiplyInstruction(long instructionIndex, InstructionParameterModes parameterModes)
         {
-            long param1 = ReadParameterValue(instructionIndex + 1, firsParamMode);
-            long param2 = ReadParameterValue(instructionIndex + 2, secondParamMode);
+            long param1 = ReadParameterValue(instructionIndex + 1, parameterModes.First);
+            long param2 = ReadParameterValue(instructionIndex + 2, parameterModes.Second);
 
-            program[program[instructionIndex + 3]] = param1 * param2;
+            WriteValue(instructionIndex + 3, parameterModes.Third, param1 * param2);
 
             return instructionIndex + 4;
         }
