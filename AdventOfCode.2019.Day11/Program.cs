@@ -26,7 +26,7 @@ namespace AdventOfCode._2019.Day11
                             return Direction.Right;
                         default:
                             throw new ArgumentException($"Invalid robot direction: {robotDirection}");
-                    }                    
+                    }
                 case Direction.Right:
                     switch (robotDirection)
                     {
@@ -40,7 +40,7 @@ namespace AdventOfCode._2019.Day11
                             return Direction.Left;
                         default:
                             throw new ArgumentException($"Invalid robot direction: {robotDirection}");
-                    }                    
+                    }
                 default:
                     throw new ArgumentException($"Invalid turning direction: {directionToTurnOn}");
             }
@@ -59,26 +59,59 @@ namespace AdventOfCode._2019.Day11
                     newPosition.X++;
                     break;
                 case Direction.Up:
-                    newPosition.Y++;
+                    newPosition.Y--;
                     break;
                 case Direction.Down:
-                    newPosition.Y--;
+                    newPosition.Y++;
                     break;
             }
 
             return newPosition;
         }
 
+        static void PrintRegistrationIdentifier(Dictionary<long, Dictionary<long, PanelColor>> panels)
+        {            
+            long minX = panels.Keys.Min();
+            if (minX >= -1)
+            {
+                minX = 0;
+            }
+            
+            long minY = panels.Values.SelectMany(t => t.Keys).Min();
+            long maxY = panels.Values.SelectMany(t => t.Keys).Max();
+            long height = Math.Abs(minY) + Math.Abs(maxY);
+            if (minY >= 0)
+            {
+                minY = 0;
+            }
+                        
+            foreach (var px in panels)
+            {
+                foreach (var py in px.Value)
+                {                    
+                    Console.SetCursorPosition((int)(px.Key + Math.Abs(minX)), (int)(py.Key + Math.Abs(minY)));
+                    Console.Write(py.Value == PanelColor.Black ? " " : "#");
+                }
+            }
+
+            Console.SetCursorPosition(0, (int)height);
+        }
+
         static void Main(string[] args)
         {
             var panels = new Dictionary<long, Dictionary<long, PanelColor>>();
+
             var robotPosition = (X: (long)0, Y: (long)0);
             var robotDirection = Direction.Up;
+
+            // init robot current position to white
+            panels[0] = new Dictionary<long, PanelColor>();
+            panels[0][0] = PanelColor.White;
 
             long[] robotProgram = InputReader.Read();
 
             Func<long?> inputReader = () =>
-            {                
+            {
                 if (!panels.ContainsKey(robotPosition.X) || !panels[robotPosition.X].ContainsKey(robotPosition.Y))
                 {
                     return (long)PanelColor.Black;
@@ -99,7 +132,7 @@ namespace AdventOfCode._2019.Day11
                     PanelColor colorToPaint = (PanelColor)outputValues[0];
                     Direction directionToTurnOn = (Direction)outputValues[1];
                     outputValues.Clear();
-                                        
+
                     // paint panel
                     if (!panels.ContainsKey(robotPosition.X))
                     {
@@ -123,8 +156,10 @@ namespace AdventOfCode._2019.Day11
                 throw new InvalidOperationException();
             }
 
-            long panelsPaintedAtLeastOnce = panels.Keys.Sum(x => panels[x].Keys.Count);
-            Console.WriteLine(panelsPaintedAtLeastOnce);
+            //long panelsPaintedAtLeastOnce = panels.Keys.Sum(x => panels[x].Keys.Count);
+            //Console.WriteLine(panelsPaintedAtLeastOnce);
+
+            PrintRegistrationIdentifier(panels);
         }
     }
 }
