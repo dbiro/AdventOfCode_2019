@@ -16,6 +16,44 @@ namespace AdventOfCode._2019.Day09
         public bool Halted { get; private set; }
         public bool WaitingForInput { get; private set; }
 
+        #region enum InstructionParameterMode
+        enum InstructionParameterMode
+        {
+            Position,
+            Immediate,
+            Relative
+        }
+        #endregion
+
+        #region struct InstructionParameterModes
+        struct InstructionParameterModes
+        {
+            public InstructionParameterMode First { get; private set; }
+            public InstructionParameterMode Second { get; private set; }
+            public InstructionParameterMode Third { get; private set; }
+
+            public InstructionParameterModes(InstructionParameterMode first, InstructionParameterMode second, InstructionParameterMode third)
+            {
+                First = first;
+                Second = second;
+                Third = third;
+            }
+
+            public override bool Equals(object obj)
+            {
+                return obj is InstructionParameterModes other &&
+                       First == other.First &&
+                       Second == other.Second &&
+                       Third == other.Third;
+            }
+
+            public override int GetHashCode()
+            {
+                return HashCode.Combine(First, Second, Third);
+            }
+        }
+        #endregion
+
         public IntcodeProgram(long[] program)
         {
             InputReader = () => int.Parse(Console.ReadLine());
