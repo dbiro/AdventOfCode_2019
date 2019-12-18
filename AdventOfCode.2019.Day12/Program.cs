@@ -5,16 +5,7 @@ using System.Linq;
 namespace AdventOfCode._2019.Day12
 {
     class Program
-    {
-        static void PrintMoons(IEnumerable<Moon> moons)
-        {
-            foreach (var moon in moons)
-            {
-                Console.WriteLine(moon);
-            }
-            Console.WriteLine();
-        }
-
+    {        
         static void Main(string[] args)
         {
             /*  INPUT */
@@ -44,30 +35,12 @@ namespace AdventOfCode._2019.Day12
             //    new Moon(9, -8, -3)
             //};
 
-            PrintMoons(moons);
+            var moonSystem = new MoonSystem(moons);
+            
+            //long totalEnergy = moonSystem.Simulate(10);
+            //Console.WriteLine(totalEnergy);
 
-            const int steps = 1000;
-
-            for (int i = 0; i < steps; i++)
-            {
-                foreach (var moon in moons)
-                {
-                    foreach (var otherMoon in moons)
-                    {
-                        moon.ApplyGravity(otherMoon);
-                    }
-
-                }
-
-                foreach (var moon in moons)
-                {
-                    moon.ApplyVelocity();
-                }
-
-                //PrintMoons(moons);
-            }
-
-            Console.WriteLine(moons.Sum(m => m.TotalEnergy));            
+            Console.WriteLine(moonSystem.Simulate());
         }
     }
 }

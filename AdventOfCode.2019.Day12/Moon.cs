@@ -22,6 +22,12 @@ namespace AdventOfCode._2019.Day12
             velocity = (0, 0, 0);
         }
 
+        public Moon(Moon moon)
+        {
+            position = moon.position;
+            velocity = moon.velocity;
+        }
+
         public void ApplyVelocity()
         {
             position.X += velocity.X;
@@ -62,6 +68,18 @@ namespace AdventOfCode._2019.Day12
         public override string ToString()
         {
             return $"pos=<x={position.X}, y={position.Y}, z={position.Z}>, vel=<x={velocity.X}, y={velocity.Y}, z={velocity.Z}>";
+        }
+
+        public override bool Equals(object obj)
+        {
+            return obj is Moon other &&
+                position == other.position &&
+                velocity == other.velocity;
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(position, velocity);
         }
     }
 }
