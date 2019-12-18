@@ -26,19 +26,7 @@ namespace AdventOfCode._2019.Day13
                     throw new ArgumentException();
             }
         }
-
-        static void PrintTiles(Dictionary<long, Dictionary<long, TileType>> tiles)
-        {            
-            foreach (var px in tiles)
-            {
-                foreach (var py in tiles[px.Key])
-                {
-                    Console.SetCursorPosition((int)px.Key, (int)py.Key);
-                    Console.Write(PrintTileType(py.Value));
-                }
-            }
-        }
-
+                
         static void Main(string[] args)
         {
             long[] inputProgram = InputReader.Read();
@@ -50,9 +38,7 @@ namespace AdventOfCode._2019.Day13
             var tiles = new Dictionary<long, Dictionary<long, TileType>>();
 
             Func<long?> inputReader = () =>
-            {
-                PrintTiles(tiles);
-
+            {                
                 long ret = 0;
                 ConsoleKeyInfo keyInfo = Console.ReadKey();
 
@@ -63,8 +49,8 @@ namespace AdventOfCode._2019.Day13
                 else if (keyInfo.Key == ConsoleKey.RightArrow)
                 {
                     ret = 1;
-                }
-                
+                }                
+
                 return ret;
             };            
 
@@ -93,6 +79,9 @@ namespace AdventOfCode._2019.Day13
                         }
 
                         tiles[posX][posY] = tileType;
+
+                        Console.SetCursorPosition((int)posX, (int)posY);
+                        Console.Write(PrintTileType(tileType));                                                
                     }                    
                 }
             };
