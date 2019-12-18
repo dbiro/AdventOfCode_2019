@@ -23,13 +23,7 @@ namespace AdventOfCode._2019.Day12
             startPosition = (posX, posY, posZ);
             velocity = (0, 0, 0);
         }
-
-        public Moon(Moon moon)
-        {
-            position = moon.position;
-            velocity = moon.velocity;
-        }
-
+               
         public void ApplyVelocity()
         {
             ApplyVelocityForAxisX();
@@ -97,17 +91,17 @@ namespace AdventOfCode._2019.Day12
 
         public bool IsAtStartOnAxisX()
         {
-            return position.X == startPosition.X;
+            return velocity.X == 0 && position.X == startPosition.X;
         }
 
         public bool IsAtStartOnAxisY()
         {
-            return position.Y == startPosition.Y;
+            return velocity.Y == 0 && position.Y == startPosition.Y;
         }
 
         public bool IsAtStartOnAxisZ()
         {
-            return position.Z == startPosition.Z;
+            return velocity.Z == 0 && position.Z == startPosition.Z;
         }
 
         public override string ToString()

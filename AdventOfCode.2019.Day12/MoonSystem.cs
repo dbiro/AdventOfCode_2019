@@ -14,12 +14,7 @@ namespace AdventOfCode._2019.Day12
         public MoonSystem(IEnumerable<Moon> moons)
         {
             this.moons = new List<Moon>(moons);
-        }
-
-        public MoonSystem(MoonSystem moonSystem)
-        {
-            moons = moonSystem.moons.Select(m => new Moon(m)).ToList();
-        }
+        }                
 
         public long Simulate(int steps, bool verbose = false)
         {
@@ -53,10 +48,8 @@ namespace AdventOfCode._2019.Day12
             return TotalEnergy;
         }
 
-        public (long, long, long) Simulate()
-        {
-            Dictionary<long, List<MoonSystem>> previousStates = new Dictionary<long, List<MoonSystem>>();
-
+        public (long, long, long) FindPeriod()
+        {            
             string[] axes = new string[] { "X", "Y", "Z" };
             var gravityActions = new Dictionary<string, Action<Moon, Moon>>()
             {
@@ -79,9 +72,9 @@ namespace AdventOfCode._2019.Day12
             var periods = new Dictionary<string, long>();
 
             foreach (var axis in axes)
-            {
-                long i;
-                for (i = 0; ; i++)
+            {                
+                int i = 0;
+                while (true)
                 {
                     foreach (var moon in moons)
                     {
@@ -89,7 +82,6 @@ namespace AdventOfCode._2019.Day12
                         {
                             gravityActions[axis](moon, otherMoon);
                         }
-
                     }
 
                     foreach (var moon in moons)
@@ -97,13 +89,15 @@ namespace AdventOfCode._2019.Day12
                         velocityActions[axis](moon);
                     }
 
+                    i++;
+
                     if (moons.All(m => isAtStartActions[axis](m)))
                     {
                         break;
-                    }
+                    }                    
                 }
 
-                periods.Add(axis, i);
+                periods[axis] = i;
             }
 
             return (periods["X"], periods["Y"], periods["Z"]);
