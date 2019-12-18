@@ -53,64 +53,62 @@ namespace AdventOfCode._2019.Day12
             return TotalEnergy;
         }
 
-        public long Simulate()
+        public (long, long, long) Simulate()
         {
             Dictionary<long, List<MoonSystem>> previousStates = new Dictionary<long, List<MoonSystem>>();
 
-            long i;
-            for (i = 0; ; i++)
+            string[] axes = new string[] { "X", "Y", "Z" };
+            var gravityActions = new Dictionary<string, Action<Moon, Moon>>()
             {
-                foreach (var moon in moons)
+                { "X", (m,o) => m.ApplyGravityForAxisX(o) },
+                { "Y", (m,o) => m.ApplyGravityForAxisY(o) },
+                { "Z", (m,o) => m.ApplyGravityForAxisZ(o) }
+            };
+            var velocityActions = new Dictionary<string, Action<Moon>>()
+            {
+                { "X", (m) => m.ApplyVelocityForAxisX() },
+                { "Y", (m) => m.ApplyVelocityForAxisY() },
+                { "Z", (m) => m.ApplyVelocityForAxisZ() }
+            };
+            var isAtStartActions = new Dictionary<string, Func<Moon, bool>>()
+            {
+                { "X", (m) => m.IsAtStartOnAxisX() },
+                { "Y", (m) => m.IsAtStartOnAxisY() },
+                { "Z", (m) => m.IsAtStartOnAxisZ() }
+            };
+            var periods = new Dictionary<string, long>();
+
+            foreach (var axis in axes)
+            {
+                long i;
+                for (i = 0; ; i++)
                 {
-                    foreach (var otherMoon in moons)
+                    foreach (var moon in moons)
                     {
-                        moon.ApplyGravity(otherMoon);
+                        foreach (var otherMoon in moons)
+                        {
+                            gravityActions[axis](moon, otherMoon);
+                        }
+
                     }
 
-                }
+                    foreach (var moon in moons)
+                    {
+                        velocityActions[axis](moon);
+                    }
 
-                foreach (var moon in moons)
-                {
-                    moon.ApplyVelocity();
-                }
-
-                long totalEnergy = TotalEnergy;
-                if (!previousStates.ContainsKey(totalEnergy))
-                {
-                    previousStates[totalEnergy] = new List<MoonSystem> { new MoonSystem(this) };
-                }
-                else
-                {
-                    if (previousStates[totalEnergy].Any(ms => ms.moons.SequenceEqual(moons)))
+                    if (moons.All(m => isAtStartActions[axis](m)))
                     {
                         break;
                     }
-                    else
-                    {
-                        previousStates[totalEnergy].Add(new MoonSystem(this));
-                    }
                 }
 
-                Console.SetCursorPosition(0, 0);
-                Console.Write(i);
+                periods.Add(axis, i);
             }
 
-            return i;
+            return (periods["X"], periods["Y"], periods["Z"]);
         }
-
-        public override int GetHashCode()
-        {
-            unchecked
-            {
-                int hash = 19;
-                foreach (var moon in moons)
-                {
-                    hash = hash * 31 + moon.GetHashCode();
-                }
-                return hash;
-            }
-        }
-
+                
         private void PrintMoons()
         {
             foreach (var moon in moons)

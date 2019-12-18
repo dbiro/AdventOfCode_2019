@@ -9,22 +9,22 @@ namespace AdventOfCode._2019.Day12
         static void Main(string[] args)
         {
             /*  INPUT */
-            List<Moon> moons = new List<Moon>()
-            {
-                new Moon(14, 15, -2),
-                new Moon(17, -3, 4),
-                new Moon(6, 12, -13),
-                new Moon(-2, 10, -8)
-            };
-
-            /* SAMPLE1 */
             //List<Moon> moons = new List<Moon>()
             //{
-            //    new Moon(-1, 0, 2),
-            //    new Moon(2, -10, -7),
-            //    new Moon(4, -8, 8),
-            //    new Moon(3, 5, -1)
+            //    new Moon(14, 15, -2),
+            //    new Moon(17, -3, 4),
+            //    new Moon(6, 12, -13),
+            //    new Moon(-2, 10, -8)
             //};
+
+            /* SAMPLE1 */
+            List<Moon> moons = new List<Moon>()
+            {
+                new Moon(-1, 0, 2),
+                new Moon(2, -10, -7),
+                new Moon(4, -8, 8),
+                new Moon(3, 5, -1)
+            };
 
             /*  SAMPLE2 */
             //List<Moon> moons = new List<Moon>()

@@ -5,6 +5,7 @@ namespace AdventOfCode._2019.Day12
     class Moon
     {
         private (int X, int Y, int Z) position;
+        private readonly (int X, int Y, int Z) startPosition;
         private (int X, int Y, int Z) velocity;
 
         public int KineticEnergy
@@ -15,10 +16,11 @@ namespace AdventOfCode._2019.Day12
 
         public int TotalEnergy
             => KineticEnergy * PotentialEnergy;
-
+                
         public Moon(int posX, int posY, int posZ)
         {
-            this.position = (posX, posY, posZ);
+            position = (posX, posY, posZ);
+            startPosition = (posX, posY, posZ);
             velocity = (0, 0, 0);
         }
 
@@ -30,13 +32,35 @@ namespace AdventOfCode._2019.Day12
 
         public void ApplyVelocity()
         {
+            ApplyVelocityForAxisX();
+            ApplyVelocityForAxisY();
+            ApplyVelocityForAxisZ();
+        }
+
+        public void ApplyVelocityForAxisX()
+        {
             position.X += velocity.X;
+        }
+
+        public void ApplyVelocityForAxisY()
+        {            
             position.Y += velocity.Y;
+        }
+
+        public void ApplyVelocityForAxisZ()
+        {
             position.Z += velocity.Z;
         }
 
         public void ApplyGravity(Moon other)
-        {            
+        {
+            ApplyGravityForAxisX(other);
+            ApplyGravityForAxisY(other);
+            ApplyGravityForAxisZ(other);
+        }
+
+        public void ApplyGravityForAxisX(Moon other)
+        {
             if (position.X > other.position.X)
             {
                 velocity.X--;
@@ -45,7 +69,10 @@ namespace AdventOfCode._2019.Day12
             {
                 velocity.X++;
             }
+        }
 
+        public void ApplyGravityForAxisY(Moon other)
+        {
             if (position.Y > other.position.Y)
             {
                 velocity.Y--;
@@ -54,7 +81,10 @@ namespace AdventOfCode._2019.Day12
             {
                 velocity.Y++;
             }
+        }
 
+        public void ApplyGravityForAxisZ(Moon other)
+        {
             if (position.Z > other.position.Z)
             {
                 velocity.Z--;
@@ -63,6 +93,21 @@ namespace AdventOfCode._2019.Day12
             {
                 velocity.Z++;
             }
+        }
+
+        public bool IsAtStartOnAxisX()
+        {
+            return position.X == startPosition.X;
+        }
+
+        public bool IsAtStartOnAxisY()
+        {
+            return position.Y == startPosition.Y;
+        }
+
+        public bool IsAtStartOnAxisZ()
+        {
+            return position.Z == startPosition.Z;
         }
 
         public override string ToString()
