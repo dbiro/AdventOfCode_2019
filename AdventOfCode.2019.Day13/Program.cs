@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 
 namespace AdventOfCode._2019.Day13
 {
@@ -39,19 +40,8 @@ namespace AdventOfCode._2019.Day13
 
             Func<long?> inputReader = () =>
             {                
-                long ret = 0;
-                ConsoleKeyInfo keyInfo = Console.ReadKey();
-
-                if (keyInfo.Key == ConsoleKey.LeftArrow)
-                {
-                    ret = -1;
-                }
-                else if (keyInfo.Key == ConsoleKey.RightArrow)
-                {
-                    ret = 1;
-                }                
-
-                return ret;
+                Thread.Sleep(50);
+                return 0;
             };            
 
             Action<long> outputWriter = output =>
@@ -67,6 +57,7 @@ namespace AdventOfCode._2019.Day13
                     {
                         userScore = outputs.Dequeue();
                         Console.SetCursorPosition(0, (int)tiles.Values.SelectMany(py => py.Keys).Max() + 1);
+                        
                         Console.Write($"Score: {userScore}");
                     }
                     else
